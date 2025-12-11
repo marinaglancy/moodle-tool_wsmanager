@@ -33,36 +33,71 @@ class helper {
         global $DB;
 
         $records = $DB->get_records('external_functions');
-        $cache = $DB->get_records(
-            'tool_wsmanager_functions',
-            [],
-            '',
-            'function_id, id, updated_description'
-        );
+        $cacherecords = $DB->get_records('tool_wsmanager_functions');
+        $cache = [];
+        foreach ($cacherecords as $record) {
+            $cache[$record->name] = $record;
+        }
+
         foreach ($records as $record) {
-            $function = \core_external\external_api::external_function_info($record);
-            $data = [
-                'description' => $function->description,
-                'allowed_from_ajax' => empty($function->allowed_from_ajax) ? 0 : 1,
-                'type' => $function->type,
-                'parameters_desc' => json_encode($this->prepare_value($function->parameters_desc)),
-                'returns_desc' => json_encode($this->prepare_value($function->returns_desc)),
-                'loginrequired' => empty($function->loginrequired) ? 0 : 1,
-                'readonlysession' => empty($function->readonlysession) ? 0 : 1,
-            ];
-            $data['all_texts'] = implode(' ', [
-                $data['description'],
-                $data['parameters_desc'],
-                $data['returns_desc'],
-            ]);
-            $cacheid = $cache[$record->id]->id ?? null;
+            $cacheid = $cache[$record->name]->id ?? null;
             if ($cacheid) {
-                $data['all_texts'] .= ' ' . $cache[$record->id]->updated_description;
-                $DB->update_record('tool_wsmanager_functions', ['id' => $cacheid] + $data);
+                $record->updated_description = $cache[$record->name]->updated_description;
+            }
+            $data = $this->prepare_function_info($record);
+            if ($cacheid) {
+                $updateneeded = false;
+                foreach ($data as $field => $value) {
+                    if ($value !== $cache[$record->name]->$field) {
+                        $updateneeded = true;
+                        break;
+                    }
+                }
+                if ($updateneeded) {
+                    $DB->update_record('tool_wsmanager_functions', ['id' => $cacheid] + $data);
+                }
             } else {
-                $cacheid = $DB->insert_record('tool_wsmanager_functions', ['function_id' => $record->id] + $data);
+                $cacheid = $DB->insert_record('tool_wsmanager_functions', $data);
             }
         }
+    }
+
+    /**
+     * Prepare function information for inserting into cache table tool_wsmanager_functions
+     *
+     * @param \stdClass $record
+     * @return array
+     */
+    public function prepare_function_info(\stdClass $record): array {
+        $function = \core_external\external_api::external_function_info($record);
+        $data = [
+            'name' => $function->name,
+            'description' => $function->description,
+            'allowed_from_ajax' => empty($function->allowed_from_ajax) ? 0 : 1,
+            'type' => $function->type,
+            'parameters_desc' => json_encode($this->prepare_value($function->parameters_desc)),
+            'returns_desc' => json_encode($this->prepare_value($function->returns_desc)),
+            'loginrequired' => empty($function->loginrequired) ? 0 : 1,
+            'readonlysession' => empty($function->readonlysession) ? 0 : 1,
+        ];
+        $data['all_texts'] = self::prepare_all_text($data);
+        return $data;
+    }
+
+    /**
+     * Prepare value of 'all_texts' field (concatenation of all text fields, used for searching)
+     *
+     * @param array $data
+     * @return string
+     */
+    public static function prepare_all_text(array $data) {
+        return implode(' ', [
+            $data['name'],
+            $data['description'],
+            $data['updated_description'] ?? '',
+            $data['parameters_desc'],
+            $data['returns_desc'],
+        ]);
     }
 
     /**
@@ -106,5 +141,26 @@ class helper {
             return [];
         }
         return array_merge([$shortclassname], self::class_name(get_parent_class($classname)));
+    }
+
+    /**
+     * Type/ajax/guest badges for displaying the function details
+     *
+     * @param \stdClass $record record containing fields from tool_wsmanager_functions table
+     * @return string
+     */
+    public static function function_badges(\stdClass $record): string {
+        $badges = '';
+        if (!empty($record->type)) {
+            $typeclass = $record->type === 'write' ? 'badge-success' : 'badge-secondary';
+            $badges .= \html_writer::tag('span', format_string($record->type), ['class' => 'badge ' . $typeclass . ' me-1']);
+        }
+        if (!empty($record->allowed_from_ajax)) {
+            $badges .= \html_writer::tag('span', 'AJAX', ['class' => 'badge badge-info me-1']);
+        }
+        if (isset($record->loginrequired) && !$record->loginrequired) {
+            $badges .= \html_writer::tag('span', 'Guests', ['class' => 'badge badge-warning me-1']);
+        }
+        return $badges;
     }
 }

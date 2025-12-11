@@ -48,7 +48,7 @@ class ws_list extends \core_reportbuilder\system_report {
         $functionscachealias = $functionscacheentity->get_table_alias('tool_wsmanager_functions');
         $this->add_entity($functionscacheentity
             ->add_join("LEFT JOIN {tool_wsmanager_functions} {$functionscachealias} ON " .
-                "{$functionscachealias}.function_id = {$entitymainalias}.id"));
+                "{$functionscachealias}.name = {$entitymainalias}.name"));
 
         // Any columns required by actions should be defined here to ensure they're always available.
         $this->add_base_fields("{$entitymainalias}.name");
@@ -68,6 +68,7 @@ class ws_list extends \core_reportbuilder\system_report {
         $this->set_downloadable(false);
 
         $this->set_initial_sort_column('external_functions:name', SORT_ASC);
+        $this->set_default_per_page(12); // To fit on one screen.
     }
 
     #[\Override]
@@ -83,7 +84,16 @@ class ws_list extends \core_reportbuilder\system_report {
      */
     protected function add_actions(): void {
 
-        // Delete action. It will be only shown if user has 'moodle/cohort:manage' capabillity.
+        // Edit description/tags action.
+        $this->add_action(new action(
+            new moodle_url('#'),
+            new pix_icon('t/edit', '', 'core'),
+            ['data-action' => 'tool_wsmanager-edit-description', 'data-function' => ':name'],
+            false,
+            new lang_string('editdetails', 'tool_wsmanager')
+        ));
+
+        // Edit services action.
         $this->add_action(new action(
             new moodle_url('#'),
             new pix_icon('t/edit', '', 'core'),

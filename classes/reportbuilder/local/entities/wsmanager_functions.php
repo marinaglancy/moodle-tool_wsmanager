@@ -88,12 +88,16 @@ class wsmanager_functions extends \core_reportbuilder\local\entities\base {
         ))
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_TEXT)
-            ->add_fields("{$tablealias}.description")
-            ->set_is_sortable(true);
+            ->add_field("COALESCE({$tablealias}.updated_description, {$tablealias}.description)", 'description')
+            ->add_fields("{$tablealias}.allowed_from_ajax, {$tablealias}.loginrequired, {$tablealias}.type")
+            ->set_is_sortable(true)
+            ->set_callback(static function ($value, $record) {
+                return \tool_wsmanager\helper::function_badges($record) .
+                    format_text($value, FORMAT_MOODLE, ['para' => false]);
+            });
 
         return $columns;
     }
-
 
     /**
      * Return list of all available filters

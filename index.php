@@ -39,8 +39,7 @@ $PAGE->set_heading($SITE->fullname);
 
 (new helper())->update_cache_table();
 
-$showall = true; // TODO What is it?
-$report = system_report_factory::create(ws_list::class, \context_system::instance(), '', '', 0, ['showall' => $showall]);
+$report = system_report_factory::create(ws_list::class, \context_system::instance(), '', '', 0, []);
 $PAGE->requires->js_call_amd('tool_wsmanager/actions', 'init');
 
 echo $OUTPUT->header();

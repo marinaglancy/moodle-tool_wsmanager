@@ -14,35 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace tool_wsmanager;
-
 /**
- * Tests for Web service manager
+ * Tag area definitions for Web service manager
  *
- * @covers     \tool_wsmanager\helper
+ * Documentation: {@link https://moodledev.io/docs/apis/subsystems/tag}
+ *
  * @package    tool_wsmanager
- * @category   test
  * @copyright  Marina Glancy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @runTestsInSeparateProcesses
  */
-final class helper_test extends \advanced_testcase {
-    public function test_update_cache_table(): void {
-        global $DB;
 
-        $this->resetAfterTest();
+defined('MOODLE_INTERNAL') || die();
 
-        // Initially the cache table is empty.
-        $count = $DB->count_records('tool_wsmanager_functions');
-        $this->assertEquals(0, $count);
-
-        $helper = new helper();
-        $helper->update_cache_table();
-
-        // After updating the cache table it should contain some records.
-        $count = $DB->count_records('tool_wsmanager_functions');
-        $countfunc = $DB->count_records('external_functions');
-        $this->assertEquals($countfunc, $count);
-    }
-}
+$tagareas = [
+    [
+        'itemtype' => 'functions',
+        'component' => 'tool_wsmanager',
+        'callback' => 'tool_wsmanager_get_tagged_functions',
+        'callbackfile' => '/admin/tool/wsmanager/locallib.php',
+    ],
+];

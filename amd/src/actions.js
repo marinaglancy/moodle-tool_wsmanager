@@ -29,6 +29,7 @@ import {dispatchEvent} from 'core/event_dispatcher';
 
 const SELECTORS = {
     EDITSERVICES: '[data-action="tool_wsmanager-edit-services"][data-function]',
+    EDITDESCRIPTION: '[data-action="tool_wsmanager-edit-description"][data-function]',
 };
 
 /**
@@ -54,7 +55,32 @@ export function init() {
                 returnFocus: editServices,
             });
 
-            // Show a toast notification when the form is submitted.
+            // Reload report when the form is submitted.
+            const reportElement = event.target.closest(reportSelectors.regions.report);
+            modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, () => {
+                dispatchEvent(reportEvents.tableReload, {preservePagination: true}, reportElement);
+            });
+
+            modalForm.show();
+        }
+
+        // Edit description/tags for the function.
+        const editDescription = event.target.closest(SELECTORS.EDITDESCRIPTION);
+        if (editDescription) {
+            event.preventDefault();
+            const functionname = editDescription.dataset.function;
+
+            const modalForm = new ModalForm({
+                modalConfig: {
+                    title: getString('editdetails', 'tool_wsmanager'),
+                },
+                formClass: 'tool_wsmanager\\form\\edit_function_form',
+                args: {functionname},
+                saveButtonText: getString('savechanges', 'moodle'),
+                returnFocus: editDescription,
+            });
+
+            // Reload report when the form is submitted.
             const reportElement = event.target.closest(reportSelectors.regions.report);
             modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, () => {
                 dispatchEvent(reportEvents.tableReload, {preservePagination: true}, reportElement);
