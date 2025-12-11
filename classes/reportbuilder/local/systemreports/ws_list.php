@@ -55,7 +55,8 @@ class ws_list extends \core_reportbuilder\system_report {
                 "{$functionscachealias}.name = {$entitymainalias}.name"));
 
         // Any columns required by actions should be defined here to ensure they're always available.
-        $this->add_base_fields("{$entitymainalias}.name");
+        $this->add_base_fields("{$entitymainalias}.name, {$functionscachealias}.parameters_desc, ".
+            "{$functionscachealias}.returns_desc");
 
         // Join tag entity.
         $entitytag = new tag();
@@ -115,6 +116,20 @@ class ws_list extends \core_reportbuilder\system_report {
      * Note the use of ":id" placeholder which will be substituted according to actual values in the row
      */
     protected function add_actions(): void {
+
+        // View details.
+        $this->add_action(new action(
+            new moodle_url('#'),
+            new pix_icon('t/preview', '', 'core'),
+            [
+                'data-action' => 'tool_wsmanager-view-details',
+                'data-function' => ':name',
+                'data-parameters-desc' => ':parameters_desc',
+                'data-return-desc' => ':returns_desc'
+            ],
+            false,
+            new lang_string('viewdetails', 'tool_wsmanager')
+        ));
 
         // Edit description/tags action.
         $this->add_action(new action(
