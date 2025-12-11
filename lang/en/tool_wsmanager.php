@@ -37,6 +37,7 @@ $string['external_functions'] = 'Functions';
 $string['functionname'] = 'Function name';
 $string['functionnames'] = 'Function names';
 $string['functions_extrainfo'] = 'Extra info on functions';
+$string['nologinrequired'] = 'Guests';
 $string['loginrequired'] = 'Login required';
 $string['originaldescription'] = 'Original description';
 $string['pluginname'] = 'Web service manager';

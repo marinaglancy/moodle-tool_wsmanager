@@ -152,14 +152,14 @@ class helper {
     public static function function_badges(\stdClass $record): string {
         $badges = '';
         if (!empty($record->type)) {
-            $typeclass = $record->type === 'write' ? 'badge-success' : 'badge-secondary';
+            $typeclass = $record->type === 'write' ? 'bg-success text-white' : 'bg-secondary';
             $badges .= \html_writer::tag('span', format_string($record->type), ['class' => 'badge ' . $typeclass . ' me-1']);
         }
         if (!empty($record->allowed_from_ajax)) {
-            $badges .= \html_writer::tag('span', 'AJAX', ['class' => 'badge badge-info me-1']);
+            $badges .= \html_writer::tag('span', 'AJAX', ['class' => 'badge bg-info text-white me-1']);
         }
         if (isset($record->loginrequired) && !$record->loginrequired) {
-            $badges .= \html_writer::tag('span', 'Guests', ['class' => 'badge badge-warning me-1']);
+            $badges .= \html_writer::tag('span', get_string('nologinrequired', 'tool_wsmanager'), ['class' => 'badge bg-warning me-1']);
         }
         return $badges;
     }
