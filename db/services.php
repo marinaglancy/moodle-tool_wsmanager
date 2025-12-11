@@ -15,18 +15,28 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for Web service manager
+ * External functions and service declaration for Web service manager
+ *
+ * Documentation: {@link https://moodledev.io/docs/apis/subsystems/external/description}
  *
  * @package    tool_wsmanager
+ * @category   webservice
  * @copyright  Marina Glancy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component    = 'tool_wsmanager';
-$plugin->release      = '1.0';
-$plugin->version      = 2025121001;
-$plugin->requires     = 2024100700;
-$plugin->supported    = [405, 501];
-$plugin->maturity     = MATURITY_STABLE;
+$functions = [
+
+    'tool_wsmanager_add_function_to_service' => [
+        'classname' => tool_wsmanager\external\add_function_to_service::class,
+        'description' => 'Adds or removes a function to web service',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'moodle/site:config',
+    ],
+];
+
+$services = [
+];

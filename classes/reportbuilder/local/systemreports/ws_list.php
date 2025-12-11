@@ -96,6 +96,10 @@ class ws_list extends \core_reportbuilder\system_report {
         // Set if report can be downloaded.
         $this->set_downloadable(false);
 
+        $this->set_checkbox_toggleall(static function (stdClass $row): array {
+            return [$row->name, $row->name];
+        });
+
         $this->set_initial_sort_column('external_functions:name', SORT_ASC);
         $this->set_default_per_page(12); // To fit on one screen.
     }
@@ -104,7 +108,6 @@ class ws_list extends \core_reportbuilder\system_report {
     protected function can_view(): bool {
         return has_capability('moodle/site:config', \context_system::instance());
     }
-
 
     /**
      * Add the system report actions. An extra column will be appended to each row, containing all actions added here

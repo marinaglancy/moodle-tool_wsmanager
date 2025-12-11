@@ -25,6 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['addtag'] = 'Add tag...';
+$string['addtoservice'] = 'Add to service';
 $string['allowedfromajax'] = 'Allowed from ajax';
 $string['alltextsfilter'] = 'All texts';
 $string['component'] = 'Component';
@@ -33,14 +35,18 @@ $string['editdetails'] = 'Edit details';
 $string['editservices'] = 'Edit services';
 $string['external_functions'] = 'Functions';
 $string['functionname'] = 'Function name';
+$string['functionnames'] = 'Function names';
 $string['functions_extrainfo'] = 'Extra info on functions';
 $string['loginrequired'] = 'Login required';
 $string['originaldescription'] = 'Original description';
 $string['pluginname'] = 'Web service manager';
 $string['privacy:metadata'] = 'The Web service manager plugin doesn\'t store any personal data.';
+$string['removefromservice'] = 'Remove from service';
+$string['removetag'] = 'Remove tag...';
 $string['selectservicesforfunction'] = 'Select services for function <b>{$a}</b>';
 $string['services'] = 'Services';
 $string['tagarea_functions'] = 'External functions';
 $string['type'] = 'Type';
 $string['type_read'] = 'read';
 $string['type_write'] = 'write';
+$string['withselectedfunctions'] = 'With selected functions...';

@@ -23,6 +23,7 @@
  */
 
 use core_reportbuilder\system_report_factory;
+use tool_wsmanager\form\bulk_action_form;
 use tool_wsmanager\helper;
 use tool_wsmanager\reportbuilder\local\systemreports\ws_list;
 
@@ -39,11 +40,24 @@ $PAGE->set_heading($SITE->fullname);
 
 (new helper())->update_cache_table();
 
+
+$bulkactions = new bulk_action_form(
+    $PAGE->url,
+    [],
+    'post',
+    '',
+    ['id' => 'tool_wsmanager-bulk-actions-form']
+);
+
 $report = system_report_factory::create(ws_list::class, \context_system::instance(), '', '', 0, []);
 $PAGE->requires->js_call_amd('tool_wsmanager/actions', 'init');
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('pluginname', 'tool_wsmanager'));
+
+echo html_writer::start_div('', ['data-region' => 'tool_wsfunction-list-wrapper']);
 echo $report->output();
+$bulkactions->display();
+echo html_writer::end_div();
 
 echo $OUTPUT->footer();

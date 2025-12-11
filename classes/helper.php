@@ -163,4 +163,46 @@ class helper {
         }
         return $badges;
     }
+
+    /**
+     * Adds or removes external functions to/from a service
+     *
+     * @param array $functionnames
+     * @param int $serviceid
+     * @param string $action
+     * @return void
+     */
+    public function add_function_to_service(array $functionnames, int $serviceid, string $action = 'add') {
+        global $DB;
+        if ($action != 'add' && $action != 'remove') {
+            throw new \moodle_exception("Action parameter must be either 'add' or 'remove'");
+        }
+
+        // Validate service exists.
+        $service = $DB->get_record('external_services', ['id' => $serviceid], '*', MUST_EXIST);
+
+        // Find which functions are already allocated to this service.
+        [$sql, $params] = $DB->get_in_or_equal($functionnames, SQL_PARAMS_NAMED);
+        $records = $DB->get_records_sql("SELECT ef.*, esf.id AS esfid
+            FROM {external_functions} ef
+            LEFT JOIN {external_services_functions} esf ON
+                ef.name = esf.functionname AND esf.externalserviceid = :serviceid
+            WHERE ef.name $sql", $params + ['serviceid' => $service->id]);
+        if (empty($records)) {
+            // No functions found.
+            return;
+        }
+
+        foreach ($records as $record) {
+            if ($action == 'add' && empty($record->esfid)) {
+                $DB->insert_record('external_services_functions', [
+                    'functionname' => $record->name,
+                    'externalserviceid' => $service->id,
+                ]);
+            }
+            if ($action == 'remove' && !empty($record->esfid)) {
+                $DB->delete_records('external_services_functions', ['id' => $record->esfid]);
+            }
+        }
+    }
 }
