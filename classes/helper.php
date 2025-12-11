@@ -159,7 +159,11 @@ class helper {
             $badges .= \html_writer::tag('span', 'AJAX', ['class' => 'badge bg-info text-white me-1']);
         }
         if (isset($record->loginrequired) && !$record->loginrequired) {
-            $badges .= \html_writer::tag('span', get_string('nologinrequired', 'tool_wsmanager'), ['class' => 'badge bg-warning me-1']);
+            $badges .= \html_writer::tag(
+                'span',
+                get_string('nologinrequired', 'tool_wsmanager'),
+                ['class' => 'badge bg-warning me-1']
+            );
         }
         return $badges;
     }

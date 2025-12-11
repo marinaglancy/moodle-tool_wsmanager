@@ -55,7 +55,7 @@ class ws_list extends \core_reportbuilder\system_report {
                 "{$functionscachealias}.name = {$entitymainalias}.name"));
 
         // Any columns required by actions should be defined here to ensure they're always available.
-        $this->add_base_fields("{$entitymainalias}.name, {$functionscachealias}.parameters_desc, ".
+        $this->add_base_fields("{$entitymainalias}.name, {$functionscachealias}.parameters_desc, " .
             "{$functionscachealias}.returns_desc");
 
         // Join tag entity.
@@ -125,7 +125,7 @@ class ws_list extends \core_reportbuilder\system_report {
                 'data-action' => 'tool_wsmanager-view-details',
                 'data-function' => ':name',
                 'data-parameters-desc' => ':parameters_desc',
-                'data-return-desc' => ':returns_desc'
+                'data-return-desc' => ':returns_desc',
             ],
             false,
             new lang_string('viewdetails', 'tool_wsmanager')
