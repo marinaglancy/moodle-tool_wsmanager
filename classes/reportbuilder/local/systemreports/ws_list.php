@@ -23,6 +23,10 @@ use stdClass;
 use tool_wsmanager\reportbuilder\local\entities\external_functions;
 use tool_wsmanager\reportbuilder\local\entities\wsmanager_functions;
 use core_reportbuilder\local\report\action;
+use core_tag\reportbuilder\local\entities\tag;
+use core_tag_tag;
+use core_reportbuilder\local\filters\tags;
+use core_reportbuilder\local\report\filter;
 
 /**
  * Class ws_list
@@ -53,14 +57,39 @@ class ws_list extends \core_reportbuilder\system_report {
         // Any columns required by actions should be defined here to ensure they're always available.
         $this->add_base_fields("{$entitymainalias}.name");
 
+        // Join tag entity.
+        $entitytag = new tag();
+        $this->add_entity($entitytag
+            ->add_joins($entitytag->get_tag_joins('tool_wsmanager', 'functions', $functionscachealias . '.id')));
+
         // Now we can call our helper methods to add the content we want to include in the report.
         $this->add_columns_from_entity($functionsentity->get_entity_name(), ['name']);
         $this->add_columns_from_entity($functionscacheentity->get_entity_name());
+
+        // Tags column.
+        $this->add_column_from_entity('tag:name')
+            ->set_title(new lang_string('tags'))
+            ->set_aggregation('groupconcat')
+            ->set_is_available(core_tag_tag::is_enabled('tool_wsmanager', 'functions') === true);
 
         $this->add_columns_from_entity($functionsentity->get_entity_name(), ['services']);
 
         $this->add_filters_from_entity($functionsentity->get_entity_name());
         $this->add_filters_from_entity($functionscacheentity->get_entity_name());
+
+        // Tags filter.
+        $this->add_filter((new filter(
+            tags::class,
+            'tags',
+            new lang_string('tags'),
+            $functionscacheentity->get_entity_name(),
+            "{$functionscachealias}.id",
+        ))
+            ->set_options([
+                'component' => 'tool_wsmanager',
+                'itemtype' => 'functions',
+            ])
+            ->set_is_available(core_tag_tag::is_enabled('tool_wsmanager', 'functions') === true));
 
         $this->add_actions();
 

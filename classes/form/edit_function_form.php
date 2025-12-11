@@ -78,8 +78,9 @@ class edit_function_form extends dynamic_form {
     public function process_dynamic_submission() {
         global $DB;
         $record = $this->get_function_data();
+        $data = $this->get_data();
 
-        $description = $this->get_data()->updated_description ?? '';
+        $description = $data->updated_description ?? '';
         if ($description === $record->description || trim($description ?? '') === '') {
             $description = null;
         }
@@ -94,16 +95,28 @@ class edit_function_form extends dynamic_form {
                 'all_texts' => $alltexts,
             ]);
         }
+
+        if (property_exists($data, "tags")) {
+            \core_tag_tag::set_item_tags(
+                'tool_wsmanager',
+                'functions',
+                $record->ws_id,
+                $this->get_context_for_dynamic_submission(),
+                $data->tags
+            );
+        }
     }
 
     #[\Override]
     public function set_data_for_dynamic_submission(): void {
         global $DB;
         $record = $this->get_function_data();
+        $tags = \core_tag_tag::get_item_tags_array('tool_wsmanager', 'functions', $record->ws_id);
         $this->set_data([
             'description' => $record->description,
             'updated_description' => $record->updated_description,
             'functionname' => $record->name,
+            'tags' => $tags,
         ]);
     }
 
@@ -142,5 +155,9 @@ class edit_function_form extends dynamic_form {
             '',
             helper::function_badges($data)
         );
+
+        $mform->addElement('tags', 'tags', get_string('tags'), [
+            'component' => 'tool_wsmanager', 'itemtype' => 'functions',
+        ]);
     }
 }
